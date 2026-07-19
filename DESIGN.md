@@ -73,6 +73,10 @@ export const radius  = { card: 14, sheet: 20, chip: 999, cell: 8 };
 
 ## 5. コンポーネント仕様
 
+### カテゴリ切替タブ（カレンダー画面上部）
+- 全部／お薬／サプリ／その他 の4等分タブ。角丸 chip、タップ領域44以上
+- 選択スタイルは登録フォームのチップと共通：選択中 = accentLight背景＋accentDark文字（500）、非選択 = 白背景＋border枠＋textSecondary
+
 ### サマリーカード（カレンダー画面上部）
 - 背景 accentLight、角丸 card、影なし
 - 左：ラベル「今日のむもの」（11 / accentDeep）＋大数字（26 / accentDark）

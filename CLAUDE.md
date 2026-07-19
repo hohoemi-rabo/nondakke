@@ -13,12 +13,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## コード構成（チケット01〜11 完了時点）
 
-- `app/(tabs)/` — 3タブ：`index.tsx`（カレンダー=ホーム。月表示＋サマリーカード＋カテゴリスワイプ＋日別詳細シート実装済み。記録トグルは `handleToggle` → `reload()` で即時反映）／`items.tsx`（一覧。カテゴリ別セクション＋中止/再開＋ヘッダー「＋」導線。最終服用日は `getLastTakenDates` の GROUP BY 一括取得）／`settings.tsx`（設定。アプリ情報＋プライバシーポリシー導線＋免責事項＋データ全削除）
+- `app/(tabs)/` — 3タブ：`index.tsx`（カレンダー=ホーム。月表示＋サマリーカード＋カテゴリタブ＋日別詳細シート実装済み。記録トグルは `handleToggle` → `reload()` で即時反映）／`items.tsx`（一覧。カテゴリ別セクション＋中止/再開＋ヘッダー「＋」導線。最終服用日は `getLastTakenDates` の GROUP BY 一括取得）／`settings.tsx`（設定。アプリ情報＋プライバシーポリシー導線＋免責事項＋データ全削除）
 - `app/privacy.tsx` — プライバシーポリシー＋免責事項の静的画面（通常 push・ルートStackに title 登録済み）。`lib/db/maintenance.ts` の `deleteAllData` が全データ削除を担う
 - `lib/confirm.ts` — `confirmAsync`（web は window.confirm、ネイティブは Alert.alert。react-native-web の Alert が no-op のため）
-- `components/calendar/` — `summary-card.tsx`／`month-calendar.tsx`（自作月グリッド。外部カレンダーライブラリ禁止）／`legend.tsx`／`category-indicator.tsx`（ドット4つ＋ラベル。タップでも循環）／`day-detail-sheet.tsx`（RNコア Modal のボトムシート。表示専用でミューテーションは親が持つ。未来日は記録不可）。表示ロジックは `lib/schedule/calendar.ts` の純粋関数（buildMonthGrid / summarizeDayEntries / summarizeToday / formatDateLabel）に分離。日別スロット導出は `lib/schedule/derive.ts` の `deriveDayDetail`
+- `components/calendar/` — `summary-card.tsx`／`month-calendar.tsx`（自作月グリッド。外部カレンダーライブラリ禁止）／`legend.tsx`／`category-tabs.tsx`（全部/お薬/サプリ/その他の4等分タブ。チップと同じ選択スタイル）／`day-detail-sheet.tsx`（RNコア Modal のボトムシート。表示専用でミューテーションは親が持つ。未来日は記録不可）。表示ロジックは `lib/schedule/calendar.ts` の純粋関数（buildMonthGrid / summarizeDayEntries / summarizeToday / formatDateLabel）に分離。日別スロット導出は `lib/schedule/derive.ts` の `deriveDayDetail`
 - `components/ui/record-button.tsx` — 「のんだ！」記録ボタン（未記録=白+枠／記録済み=accentLight+チェック。確認ダイアログなし・取り消しは再タップ）
-- `lib/category-filter.ts` — カテゴリフィルタの循環ロジック（null=全部はUI概念のため domain.ts に置かない）。スワイプは Pan + `.runOnJS(true)`、`GestureHandlerRootView` はルートレイアウトに設置済み
+- `lib/category-filter.ts` — カテゴリフィルタの型・順序・ラベル（null=全部はUI概念のため domain.ts に置かない）。旧スワイプUIは廃止済み（タブ切替に変更）。`GestureHandlerRootView` は react-navigation 用にルートレイアウトに残置
 - `app/item/` — `new.tsx`（新規登録）／`[id].tsx`（編集）。ルートレイアウトで `presentation: 'modal'` 登録。ルートファイルは薄く保ち、フォーム本体は `components/item-form.tsx`
 - `constants/tokens.ts` — カラー・余白・角丸・タイポのデザイントークン（DESIGN.md §2〜§4 の唯一のコード化。色リテラルをここ以外に書かない）
 - `constants/domain.ts` — Category / Timing / ScheduleType の型・定数・日本語ラベル＋曜日定数（WEEKDAY_LABELS / WEEKDAYS_MON_FIRST）
