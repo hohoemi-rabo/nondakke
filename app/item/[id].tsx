@@ -5,7 +5,8 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { ItemForm } from '@/components/item-form';
 import { colors, typography } from '@/constants/tokens';
-import { getItem, updateItem } from '@/lib/db/items';
+import { confirmAsync } from '@/lib/confirm';
+import { deleteItem, getItem, updateItem } from '@/lib/db/items';
 import { type Item } from '@/lib/db/types';
 
 export default function EditItemScreen() {
@@ -54,6 +55,18 @@ export default function EditItemScreen() {
       initialItem={item}
       onSave={async (input) => {
         await updateItem(db, item.id, input);
+        router.back();
+      }}
+      onDelete={async () => {
+        const ok = await confirmAsync(
+          'このアイテムを削除しますか？',
+          `「${item.name}」と服用記録がすべて削除されます。この操作は取り消せません。\n記録を残して服用をやめる場合は、一覧画面の「中止」を使ってください。`,
+          '削除する'
+        );
+        if (!ok) {
+          return;
+        }
+        await deleteItem(db, item.id);
         router.back();
       }}
     />

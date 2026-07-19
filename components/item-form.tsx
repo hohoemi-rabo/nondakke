@@ -37,16 +37,19 @@ type ItemFormProps = {
   initialItem?: Item;
   // 保存成功時のナビゲーションは呼び出し側が行う
   onSave: (input: ItemInput) => Promise<void>;
+  // 編集時のみ渡す。確認ダイアログ・削除実行・ナビゲーションは呼び出し側が行う
+  onDelete?: () => Promise<void>;
 };
 
 // アイテム登録・編集フォーム（docs/06、DESIGN.md §5）。
 // 必須2項目（名前・服用パターン）を最上部、任意項目は下に寄せる
-export function ItemForm({ initialItem, onSave }: ItemFormProps) {
+export function ItemForm({ initialItem, onSave, onDelete }: ItemFormProps) {
   const [form, setForm] = useState(() =>
     initialItem ? itemFormStateFromItem(initialItem) : emptyItemFormState()
   );
   const [attempted, setAttempted] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // エラーは保存を試みた後だけ表示し、修正されれば自動で消える
   const errors = attempted ? validateItemForm(form) : {};
@@ -62,6 +65,20 @@ export function ItemForm({ initialItem, onSave }: ItemFormProps) {
     } catch (e) {
       setSaving(false);
       Alert.alert('保存できませんでした', e instanceof Error ? e.message : String(e));
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!onDelete) {
+      return;
+    }
+    setDeleting(true);
+    try {
+      await onDelete();
+    } catch (e) {
+      Alert.alert('削除できませんでした', e instanceof Error ? e.message : String(e));
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -197,11 +214,21 @@ export function ItemForm({ initialItem, onSave }: ItemFormProps) {
 
         <Pressable
           onPress={handleSave}
-          disabled={saving}
+          disabled={saving || deleting}
           accessibilityRole="button"
-          style={[styles.saveButton, saving && styles.saveButtonDisabled]}>
+          style={[styles.saveButton, (saving || deleting) && styles.saveButtonDisabled]}>
           <Text style={styles.saveButtonLabel}>保存する</Text>
         </Pressable>
+
+        {onDelete != null && (
+          <Pressable
+            onPress={handleDelete}
+            disabled={saving || deleting}
+            accessibilityRole="button"
+            style={[styles.deleteButton, (saving || deleting) && styles.saveButtonDisabled]}>
+            <Text style={styles.deleteButtonLabel}>このアイテムを削除</Text>
+          </Pressable>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -288,5 +315,18 @@ const styles = StyleSheet.create({
     ...typography.body,
     fontWeight: '500',
     color: colors.accentDark,
+  },
+  deleteButton: {
+    minHeight: minTapSize,
+    borderRadius: radius.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteButtonLabel: {
+    ...typography.body,
+    color: colors.error,
   },
 });
