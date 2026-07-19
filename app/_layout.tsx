@@ -18,6 +18,7 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="item/new" options={{ presentation: 'modal', title: '新規登録' }} />
           <Stack.Screen name="item/[id]" options={{ presentation: 'modal', title: '編集' }} />
+          <Stack.Screen name="privacy" options={{ title: 'プライバシーポリシー' }} />
         </Stack>
         <StatusBar style="dark" />
       </SQLiteProvider>
