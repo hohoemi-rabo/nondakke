@@ -113,17 +113,32 @@ describe('interval', () => {
     expect(today[0].isOverdue).toBe(true);
   });
 
-  it('期限超過中は未来日に予定を出さない（服用時に再計算）', () => {
-    const records = [makeRecord(item.id, '2026-07-10')];
-    expect(isScheduledOn(item, records, '2026-07-20', TODAY)).toBe(false);
-    expect(isScheduledOn(item, records, '2026-07-22', TODAY)).toBe(false);
+  it('未来日は次回予定日からN日周期で見込みが並ぶ', () => {
+    const records = [makeRecord(item.id, TODAY)];
+    expect(isScheduledOn(item, records, '2026-07-22', TODAY)).toBe(true); // 次回
+    expect(isScheduledOn(item, records, '2026-07-25', TODAY)).toBe(true); // 次々回以降も見込み表示
+    expect(isScheduledOn(item, records, '2026-07-28', TODAY)).toBe(true);
+    expect(isScheduledOn(item, records, '2026-07-21', TODAY)).toBe(false); // 周期に一致しない日
+    expect(isScheduledOn(item, records, '2026-07-23', TODAY)).toBe(false);
   });
 
-  it('未来日は次回予定日のみ予定になる', () => {
-    const records = [makeRecord(item.id, TODAY)];
-    expect(isScheduledOn(item, records, '2026-07-22', TODAY)).toBe(true);
-    expect(isScheduledOn(item, records, '2026-07-21', TODAY)).toBe(false);
-    expect(isScheduledOn(item, records, '2026-07-25', TODAY)).toBe(false); // 次々回は出さない
+  it('登録直後（記録なし）でも開始日起点のN日周期で未来に見込みが並ぶ', () => {
+    // 今日登録して2日に1回を設定した場合（ユーザー報告のシナリオ）
+    const fresh = makeItem({
+      scheduleType: 'interval',
+      intervalDays: 2,
+      createdAt: '2026-07-19T12:00:00.000Z',
+    });
+    expect(isScheduledOn(fresh, [], TODAY, TODAY)).toBe(true); // 初回=開始日
+    expect(isScheduledOn(fresh, [], '2026-07-21', TODAY)).toBe(true);
+    expect(isScheduledOn(fresh, [], '2026-07-23', TODAY)).toBe(true);
+    expect(isScheduledOn(fresh, [], '2026-07-20', TODAY)).toBe(false);
+  });
+
+  it('期限超過中も旧予定日起点の周期で未来に見込みを出す（服用でずれて再計算）', () => {
+    const records = [makeRecord(item.id, '2026-07-10')]; // 予定は 07-13 だった
+    expect(isScheduledOn(item, records, '2026-07-22', TODAY)).toBe(true); // 07-13 + 3日×3
+    expect(isScheduledOn(item, records, '2026-07-20', TODAY)).toBe(false); // 周期に一致しない
   });
 
   it('再計算：過去日の記録を追加すると予定がずれる', () => {

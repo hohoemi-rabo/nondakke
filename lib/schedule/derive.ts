@@ -4,7 +4,7 @@
 
 import { type RecordTiming } from '@/constants/domain';
 import { type IntakeRecord, type Item } from '@/lib/db/types';
-import { addDays, datesOfMonth, toDateString, weekdayOf } from '@/lib/schedule/date';
+import { addDays, datesOfMonth, diffDays, toDateString, weekdayOf } from '@/lib/schedule/date';
 
 export type TodaySlot = {
   timing: RecordTiming;
@@ -88,8 +88,8 @@ export function getNextDueDate(item: Item, records: IntakeRecord[], today: strin
 // date が item の予定日か。
 // interval は「date より前の最終服用日 + N ≤ date」（記録なしなら「開始日 ≤ date」）——
 // 期限超過の予定が服用まで毎日残り続ける挙動はこの式から自然に導かれる。
-// ただし未来日（today より後）は、全記録から計算した次回予定日に一致する日のみ予定とする
-// （未来のカレンダーを予定だらけにしない。飲んだ時点で次回が再計算される）
+// 未来日（today より後）は、次回予定日を起点にN日周期の「見込み」を投影する
+// （カレンダーで周期が見えるようにする。実際に飲んだ日がずれれば導出方式のため自動で再計算される）
 export function isScheduledOn(
   item: Item,
   records: IntakeRecord[],
@@ -113,7 +113,12 @@ export function isScheduledOn(
         return false;
       }
       if (date > today) {
-        return getNextDueDate(item, records, today) === date;
+        const due = getNextDueDate(item, records, today);
+        if (due === null) {
+          return false;
+        }
+        const diff = diffDays(due, date);
+        return diff >= 0 && diff % item.intervalDays === 0;
       }
       const last = lastTakenBefore(records, item.id, date);
       const due = last === null ? start : addDays(last, item.intervalDays);
