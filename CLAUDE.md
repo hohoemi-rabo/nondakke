@@ -24,7 +24,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `constants/domain.ts` — Category / Timing / ScheduleType の型・定数・日本語ラベル＋曜日定数（WEEKDAY_LABELS / WEEKDAYS_MON_FIRST）
 - `components/ui/` — Card / Chip / CategoryDot（+テンプレート由来で継続使用の icon-symbol, haptic-tab）
 - `components/item-form.tsx` — 登録・編集共有フォーム。フォーム状態・バリデーションの純粋ロジックは `lib/item-form.ts`（テストは `lib/__tests__/`）
-- `lib/db/` — `migrations.ts`（PRAGMA user_version 方式・スキーマv1）／`types.ts`（行型とアプリ型の分離）／`items.ts`・`records.ts`（リポジトリ。画面から生SQLを書かない）
+- `lib/db/` — `migrations.ts`（PRAGMA user_version 方式・スキーマv1）／`types.ts`（行型とアプリ型の分離）／`items.ts`・`records.ts`・`maintenance.ts`（リポジトリ。画面から生SQLを書かない）
 - `lib/schedule/` — `date.ts`（YYYY-MM-DD 文字列ベースの日付演算）／`derive.ts`（予定日導出の純粋関数：`isScheduledOn` / `getNextDueDate` / `getTodayItems` / `getMonthSchedule`）。DB・React 非依存を維持すること
 - `metro.config.js` — expo-sqlite の web 対応（wasm asset 解決＋COOP/COEP ヘッダー）。`npm run web` での動作確認に必要
 
@@ -36,7 +36,7 @@ npm run android      # Android エミュレータ/実機で起動
 npm run web          # ブラウザで起動
 npm run lint         # expo lint（eslint-config-expo, flat config）
 npx tsc --noEmit     # 型チェック
-npm test             # jest（jest-expo preset）。単体テストは lib/schedule/__tests__/
+npm test             # jest（jest-expo preset）。単体テストは lib/__tests__/ と lib/schedule/__tests__/
 ```
 
 ## アーキテクチャ上の重要な決定
