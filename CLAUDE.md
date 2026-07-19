@@ -11,14 +11,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 仕様の唯一の情報源は **REQUIREMENTS.md**（要件・データモデル・画面構成）と **DESIGN.md**（カラートークン・タイポ・コンポーネント仕様）。実装前に必ず両方を参照すること
 - 実装タスクは **docs/00-overview.md** のチケット（01〜12、依存関係つき）に分割済み。着手時は該当チケットを読み、完了条件を満たすこと。チケット完了時はチケットファイルのチェックボックスと 00-overview.md の状態列を更新する（docs: コミットで実装と分離）
 
-## コード構成（チケット01〜05 完了時点）
+## コード構成（チケット01〜06 完了時点）
 
-- `app/(tabs)/` — 3タブ：`index.tsx`（カレンダー=ホーム）／`items.tsx`（一覧）／`settings.tsx`（設定）。06〜11 でプレースホルダーから実装に置き換える
+- `app/(tabs)/` — 3タブ：`index.tsx`（カレンダー=ホーム）／`items.tsx`（一覧）／`settings.tsx`（設定）。07〜11 でプレースホルダーから実装に置き換える
+- `app/item/` — `new.tsx`（新規登録）／`[id].tsx`（編集）。ルートレイアウトで `presentation: 'modal'` 登録。ルートファイルは薄く保ち、フォーム本体は `components/item-form.tsx`
 - `constants/tokens.ts` — カラー・余白・角丸・タイポのデザイントークン（DESIGN.md §2〜§4 の唯一のコード化。色リテラルをここ以外に書かない）
-- `constants/domain.ts` — Category / Timing / ScheduleType の型・定数・日本語ラベル
+- `constants/domain.ts` — Category / Timing / ScheduleType の型・定数・日本語ラベル＋曜日定数（WEEKDAY_LABELS / WEEKDAYS_MON_FIRST）
 - `components/ui/` — Card / Chip / CategoryDot（+テンプレート由来で継続使用の icon-symbol, haptic-tab）
+- `components/item-form.tsx` — 登録・編集共有フォーム。フォーム状態・バリデーションの純粋ロジックは `lib/item-form.ts`（テストは `lib/__tests__/`）
 - `lib/db/` — `migrations.ts`（PRAGMA user_version 方式・スキーマv1）／`types.ts`（行型とアプリ型の分離）／`items.ts`・`records.ts`（リポジトリ。画面から生SQLを書かない）
 - `lib/schedule/` — `date.ts`（YYYY-MM-DD 文字列ベースの日付演算）／`derive.ts`（予定日導出の純粋関数：`isScheduledOn` / `getNextDueDate` / `getTodayItems` / `getMonthSchedule`）。DB・React 非依存を維持すること
+- `metro.config.js` — expo-sqlite の web 対応（wasm asset 解決＋COOP/COEP ヘッダー）。`npm run web` での動作確認に必要
 
 ## コマンド
 
