@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Chip } from '@/components/ui/chip';
 import {
@@ -50,6 +51,9 @@ export function ItemForm({ initialItem, onSave, onDelete }: ItemFormProps) {
   const [attempted, setAttempted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  // Android はエッジトゥエッジ表示のため、下端インセットを足さないと
+  // ボタンがナビゲーションバーに重なる
+  const insets = useSafeAreaInsets();
 
   // エラーは保存を試みた後だけ表示し、修正されれば自動で消える
   const errors = attempted ? validateItemForm(form) : {};
@@ -88,7 +92,7 @@ export function ItemForm({ initialItem, onSave, onDelete }: ItemFormProps) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         style={styles.flex}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: spacing.xl + insets.bottom }]}
         keyboardShouldPersistTaps="handled">
         <View style={styles.section}>
           <View style={styles.labelRow}>

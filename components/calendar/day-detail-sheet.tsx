@@ -1,4 +1,5 @@
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CategoryDot } from '@/components/ui/category-dot';
 import { RecordButton } from '@/components/ui/record-button';
@@ -65,6 +66,9 @@ function SheetBody({
   onClose,
 }: DayDetailSheetProps & { date: string }) {
   const { entries, asNeeded } = deriveDayDetail(items, records, date, today);
+  // シートは画面最下端に付くため、下端インセットを足さないと
+  // 記録ボタンが Android のナビゲーションバーに重なる
+  const insets = useSafeAreaInsets();
   const isFuture = date > today;
   const isEmpty = entries.length === 0 && (isFuture || asNeeded.length === 0);
 
@@ -101,7 +105,8 @@ function SheetBody({
         </Pressable>
       </View>
       {isFuture && <Text style={styles.futureNote}>未来の日付には記録できません</Text>}
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={[styles.content, { paddingBottom: spacing.md + insets.bottom }]}>
         {isEmpty ? (
           <Text style={styles.emptyText}>この日の予定はありません</Text>
         ) : (

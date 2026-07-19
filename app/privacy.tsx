@@ -1,11 +1,16 @@
 import { ScrollView, StyleSheet, Text } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors, spacing, typography } from '@/constants/tokens';
 
 // プライバシーポリシー＋免責事項（アプリ内静的表示。docs/11、REQUIREMENTS.md §7・§9）
 export default function PrivacyScreen() {
+  // Android のエッジトゥエッジ表示で末尾がナビゲーションバーに隠れないよう下端インセットを足す
+  const insets = useSafeAreaInsets();
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={[styles.content, { paddingBottom: spacing.md + insets.bottom }]}>
       <Text style={styles.body}>
         「のんだっけ？」（以下「本アプリ」）は、ユーザーのプライバシーを尊重します。
       </Text>
