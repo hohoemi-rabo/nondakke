@@ -28,7 +28,7 @@
 | 03 | [SQLiteデータベース基盤](03-database-setup.md) | expo-sqlite導入、スキーマ、マイグレーション | ✅ 完了 |
 | 04 | [データアクセス層](04-data-access-layer.md) | items / intake_records のCRUD関数 | ✅ 完了 |
 | 05 | [予定日導出ロジック](05-schedule-derivation.md) | スケジュール計算のコアロジック＋単体テスト | ✅ 完了 |
-| 06 | [アイテム登録・編集画面](06-item-form-screen.md) | 30秒で登録完了できるフォーム | 未着手 |
+| 06 | [アイテム登録・編集画面](06-item-form-screen.md) | 30秒で登録完了できるフォーム | 完了 |
 | 07 | [カレンダー画面](07-calendar-screen.md) | 月表示カレンダー＋サマリーカード（ホーム） | 未着手 |
 | 08 | [カテゴリ切替スワイプ](08-category-swipe.md) | 左右スワイプでカテゴリフィルタ | 未着手 |
 | 09 | [日別詳細シート・記録機能](09-daily-detail-sheet.md) | ワンタップ記録、過去日の追記・修正・削除 | 未着手 |
