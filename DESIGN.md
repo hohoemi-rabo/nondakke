@@ -86,9 +86,9 @@ export const radius  = { card: 14, sheet: 20, chip: 999, cell: 8 };
 - 非選択 = 白背景＋border枠＋textSecondary
 
 ### サマリーカード（カレンダー画面上部）
-- 背景 accentLight、角丸 card、影なし
-- 左：ラベル「今日のむもの」（11 / accentDeep）＋大数字（26 / accentDark）
-- 右：「✓ のんだ n」「のこり n」（12 / accentDeep）
+- 背景は選択中カテゴリのテーマ淡色（全部・お薬=accentLight、サプリ=catSupplementLight、その他=catOtherLight）。角丸 card、影なし
+- 左：ラベル「今日のむもの」（11 / テーマ deep 色）＋大数字（26 / テーマ dark 色）
+- 右：「✓ のんだ n」「のこり n」（12 / テーマ deep 色）
 - 全部飲み終えたら文言を「今日はぜんぶのんだ！」に変える（数字ゼロを見せない）
 
 ### カレンダー
@@ -96,7 +96,7 @@ export const radius  = { card: 14, sheet: 20, chip: 999, cell: 8 };
 - 日セル：予定ありの日はカテゴリ色ドット（5px、最大3個、4個以上は「+」表現）
 - 記録済みの過去日：ドットの代わりにチェックマーク（accent）、日付数字は textMuted
 - 予定があったのに未記録の過去日：ドットを輪郭のみ（塗りなし）で表示
-- 今日：セル背景 accentLight・角丸 cell、日付数字 500
+- 今日：セル背景は選択中カテゴリのテーマ淡色（タブ・サマリーカードと連動）・角丸 cell、日付数字 500
 - 凡例（お薬・サプリ・その他）をカレンダー直下に常時表示
 
 ### 記録ボタン（日別詳細シート内）
