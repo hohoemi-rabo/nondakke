@@ -23,13 +23,13 @@
 
 ## タスク
 
-- [ ] `lib/schedule/derive.ts` に純粋関数として実装（DBに依存しない：items と records の配列を受け取る）
+- [x] `lib/schedule/derive.ts` に純粋関数として実装（DBに依存しない：items と records の配列を受け取る）
   - `isScheduledOn(item, records, date): boolean` — その日が予定日か
   - `getTodayItems(items, records, today)` — 「今日のむもの」リスト（interval の期限超過分を含む）
   - `getMonthSchedule(items, records, yearMonth)` — カレンダー1ヶ月分の日別予定・記録状態（予定あり／記録済み／予定なのに未記録）
-- [ ] 日付演算は文字列 `YYYY-MM-DD` ベースのユーティリティで行う（`lib/schedule/date.ts`）。タイムゾーンによる日付ズレを避けるため `Date` の UTC/ローカル混在に注意
-- [ ] テスト環境を導入：`jest-expo` + `npx expo install jest-expo jest @types/jest`、package.json に `"test": "jest"` を追加
-- [ ] 単体テストを作成（`lib/schedule/__tests__/`）
+- [x] 日付演算は文字列 `YYYY-MM-DD` ベースのユーティリティで行う（`lib/schedule/date.ts`）。タイムゾーンによる日付ズレを避けるため `Date` の UTC/ローカル混在に注意
+- [x] テスト環境を導入：`jest-expo` + `npx expo install jest-expo jest @types/jest`、package.json に `"test": "jest"` を追加
+- [x] 単体テストを作成（`lib/schedule/__tests__/`）
   - daily / weekly：記録の有無にかかわらず予定日が固定であること
   - interval：記録なし→開始日が初回予定、記録あり→最終服用日＋N日
   - interval 期限超過：予定日を過ぎても「今日のむもの」に残り続けること
