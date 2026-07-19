@@ -14,6 +14,8 @@ export default function RootLayout() {
     <SQLiteProvider databaseName="nodakke.db" onInit={migrateDbIfNeeded}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="item/new" options={{ presentation: 'modal', title: '新規登録' }} />
+        <Stack.Screen name="item/[id]" options={{ presentation: 'modal', title: '編集' }} />
       </Stack>
       <StatusBar style="dark" />
     </SQLiteProvider>

@@ -25,6 +25,12 @@ export const TIMING_LABELS: Record<Timing, string> = {
   bedtime: '就寝前',
 };
 
+// index = JS getDay() / items.weekdays の値（0=日〜6=土）
+export const WEEKDAY_LABELS = ['日', '月', '火', '水', '木', '金', '土'] as const;
+
+// UI表示順（月〜日）。値はDBに保存する weekday 番号
+export const WEEKDAYS_MON_FIRST = [1, 2, 3, 4, 5, 6, 0] as const;
+
 export type ScheduleType = 'daily' | 'interval' | 'weekly' | 'as_needed';
 
 export const SCHEDULE_TYPES: ScheduleType[] = ['daily', 'interval', 'weekly', 'as_needed'];
