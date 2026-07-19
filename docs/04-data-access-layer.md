@@ -11,18 +11,18 @@
 
 ## タスク
 
-- [ ] `lib/db/items.ts` — アイテムのリポジトリ
+- [x] `lib/db/items.ts` — アイテムのリポジトリ
   - `createItem(db, input)` / `updateItem(db, id, input)` / `getItem(db, id)` / `listItems(db, { category?, activeOnly? })`
   - `deactivateItem(db, id)`（is_active=0。物理削除しない — 履歴を残すため）
   - `deleteItem(db, id)`（物理削除。関連する intake_records も同一トランザクションで削除）
-- [ ] `lib/db/records.ts` — 摂取記録のリポジトリ
+- [x] `lib/db/records.ts` — 摂取記録のリポジトリ
   - `addRecord(db, { itemId, takenDate, timing })`（recorded_at は現在日時）
   - `removeRecord(db, { itemId, takenDate, timing })`（再タップでの取り消しに使用）
   - `listRecordsByMonth(db, yearMonth)`（カレンダー描画用。月単位で一括取得）
   - `listRecordsByDate(db, date)`（日別詳細シート用）
   - `getLastTakenDate(db, itemId)`（一覧画面の「最終服用日」と interval 型の予定算出に使用）
-- [ ] すべてのクエリをプレースホルダ（`?`）でパラメータ化
-- [ ] 入力バリデーション：category / schedule_type / timing は定義済みの値のみ受け付ける。interval 型は interval_days 必須、weekly 型は weekdays 必須
+- [x] すべてのクエリをプレースホルダ（`?`）でパラメータ化
+- [x] 入力バリデーション：category / schedule_type / timing は定義済みの値のみ受け付ける。interval 型は interval_days 必須、weekly 型は weekdays 必須
 
 ## 設計メモ
 
