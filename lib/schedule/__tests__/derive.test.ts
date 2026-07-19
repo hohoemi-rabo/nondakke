@@ -272,6 +272,7 @@ describe('deriveDayDetail', () => {
           { timing: 'morning', taken: false },
           { timing: 'evening', taken: false },
         ],
+        overdueDays: null,
       },
     ]);
     expect(asNeeded).toEqual([]);
@@ -308,11 +309,15 @@ describe('deriveDayDetail', () => {
     const item = makeItem({ scheduleType: 'as_needed', timings: [] });
     const empty = deriveDayDetail([item], [], TODAY, TODAY);
     expect(empty.entries).toHaveLength(0);
-    expect(empty.asNeeded).toEqual([{ item, slots: [{ timing: 'none', taken: false }] }]);
+    expect(empty.asNeeded).toEqual([
+      { item, slots: [{ timing: 'none', taken: false }], overdueDays: null },
+    ]);
 
     const records = [makeRecord(item.id, TODAY, 'none')];
     const recorded = deriveDayDetail([item], records, TODAY, TODAY);
-    expect(recorded.entries).toEqual([{ item, slots: [{ timing: 'none', taken: true }] }]);
+    expect(recorded.entries).toEqual([
+      { item, slots: [{ timing: 'none', taken: true }], overdueDays: null },
+    ]);
     expect(recorded.asNeeded).toHaveLength(0);
   });
 
@@ -348,5 +353,36 @@ describe('deriveDayDetail', () => {
     // 開始日 2026-07-01・記録なし → 7/1 以降ずっと予定が残る
     const { entries } = deriveDayDetail([item], [], '2026-07-10', TODAY);
     expect(entries).toHaveLength(1);
+  });
+
+  describe('overdueDays（飲み忘れ日数）', () => {
+    const item = makeItem({ scheduleType: 'interval', intervalDays: 3 });
+
+    it('interval の期限超過中は今日のシートで遅れ日数を返す', () => {
+      // 07-10 服用 → 予定 07-13 → 今日 07-19 で6日遅れ
+      const records = [makeRecord(item.id, '2026-07-10')];
+      const { entries } = deriveDayDetail([item], records, TODAY, TODAY);
+      expect(entries[0].overdueDays).toBe(6);
+    });
+
+    it('今日以外の日付のシートでは表示しない', () => {
+      const records = [makeRecord(item.id, '2026-07-10')];
+      const { entries } = deriveDayDetail([item], records, '2026-07-15', TODAY);
+      expect(entries[0].overdueDays).toBeNull();
+    });
+
+    it('今日記録すると次回予定が未来に張り直されて消える', () => {
+      const records = [makeRecord(item.id, '2026-07-10'), makeRecord(item.id, TODAY)];
+      const { entries } = deriveDayDetail([item], records, TODAY, TODAY);
+      expect(entries[0].overdueDays).toBeNull();
+    });
+
+    it('予定日当日（超過なし）と daily は null', () => {
+      // 07-16 服用 → 予定はちょうど今日
+      const onTime = [makeRecord(item.id, '2026-07-16')];
+      expect(deriveDayDetail([item], onTime, TODAY, TODAY).entries[0].overdueDays).toBeNull();
+      const daily = makeItem({ scheduleType: 'daily' });
+      expect(deriveDayDetail([daily], [], TODAY, TODAY).entries[0].overdueDays).toBeNull();
+    });
   });
 });

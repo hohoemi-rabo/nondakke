@@ -13,7 +13,7 @@ import { SummaryCard } from '@/components/calendar/summary-card';
 import { colors, minTapSize, radius, spacing, typography } from '@/constants/tokens';
 import { type CategoryFilter } from '@/lib/category-filter';
 import { listItems } from '@/lib/db/items';
-import { addRecord, listRecordsByMonth, removeRecord, type RecordKey } from '@/lib/db/records';
+import { addRecord, listRecords, removeRecord, type RecordKey } from '@/lib/db/records';
 import { type IntakeRecord, type Item } from '@/lib/db/types';
 import { summarizeToday } from '@/lib/schedule/calendar';
 import { addMonths, monthOf, toDateString } from '@/lib/schedule/date';
@@ -30,24 +30,20 @@ export default function CalendarScreen() {
   // タップで選択した日。非 null の間、日別詳細シートを表示する
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [items, setItems] = useState<Item[] | null>(null); // null = 初回ロード前
-  const [monthRecords, setMonthRecords] = useState<IntakeRecord[]>([]);
-  const [todayRecords, setTodayRecords] = useState<IntakeRecord[]>([]);
+  // 記録は全件保持する。interval 型の予定導出が表示月外の最終服用日に依存するため月単位では不十分
+  const [records, setRecords] = useState<IntakeRecord[]>([]);
 
-  // フォーカス時・月送り時に再取得。記録変更後（09）は reload を直接呼ぶ
+  // フォーカス時に再取得。記録変更後（09）は reload を直接呼ぶ
   async function reload() {
     const now = toDateString(new Date());
     setToday(now);
-    const [allItems, mRecords] = await Promise.all([
+    const [allItems, allRecords] = await Promise.all([
       // 非アクティブのアイテムの記録も表示対象のため全件取得（derive 側が isActive を処理）
       listItems(db),
-      listRecordsByMonth(db, yearMonth),
+      listRecords(db),
     ]);
-    // サマリーカードは常に「今日」を表示する。表示月が今日の月でない場合は別途取得
-    const tRecords =
-      yearMonth === monthOf(now) ? mRecords : await listRecordsByMonth(db, monthOf(now));
     setItems(allItems);
-    setMonthRecords(mRecords);
-    setTodayRecords(tRecords);
+    setRecords(allRecords);
   }
 
   useFocusEffect(() => {
@@ -91,8 +87,8 @@ export default function CalendarScreen() {
 
   const filteredItems =
     selectedCategory === null ? items : items.filter((i) => i.category === selectedCategory);
-  const schedule = getMonthSchedule(filteredItems, monthRecords, yearMonth, today);
-  const { taken, remaining } = summarizeToday(getTodayItems(filteredItems, todayRecords, today));
+  const schedule = getMonthSchedule(filteredItems, records, yearMonth, today);
+  const { taken, remaining } = summarizeToday(getTodayItems(filteredItems, records, today));
 
   return (
     <SafeAreaView style={styles.container}>
@@ -118,7 +114,7 @@ export default function CalendarScreen() {
         date={selectedDate}
         today={today}
         items={items}
-        records={monthRecords}
+        records={records}
         onToggle={handleToggle}
         onClose={() => setSelectedDate(null)}
       />

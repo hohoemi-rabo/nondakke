@@ -53,29 +53,12 @@ export async function removeRecord(db: SQLiteDatabase, key: RecordKey): Promise<
   );
 }
 
-// カレンダー描画用の月一括取得（日ごとにクエリを発行しない — N+1回避）
-export async function listRecordsByMonth(
-  db: SQLiteDatabase,
-  yearMonth: string // YYYY-MM
-): Promise<IntakeRecord[]> {
-  if (!/^\d{4}-\d{2}$/.test(yearMonth)) {
-    throw new Error(`不正な年月形式です: ${yearMonth}`);
-  }
+// カレンダー描画・予定導出用の全件取得。
+// interval 型の予定は表示月の外にある最終服用日に依存するため、月単位の取得では正しく導出できない。
+// 個人の服薬記録なので全件でも小規模（数年分で数千行程度）
+export async function listRecords(db: SQLiteDatabase): Promise<IntakeRecord[]> {
   const rows = await db.getAllAsync<IntakeRecordRow>(
-    "SELECT * FROM intake_records WHERE taken_date LIKE ? || '-%' ORDER BY taken_date, item_id",
-    yearMonth
-  );
-  return rows.map(recordFromRow);
-}
-
-// 日別詳細シート用
-export async function listRecordsByDate(
-  db: SQLiteDatabase,
-  date: string // YYYY-MM-DD
-): Promise<IntakeRecord[]> {
-  const rows = await db.getAllAsync<IntakeRecordRow>(
-    'SELECT * FROM intake_records WHERE taken_date = ? ORDER BY item_id',
-    date
+    'SELECT * FROM intake_records ORDER BY taken_date, item_id'
   );
   return rows.map(recordFromRow);
 }

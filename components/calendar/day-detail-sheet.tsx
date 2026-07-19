@@ -14,7 +14,7 @@ type DayDetailSheetProps = {
   date: string | null; // null = 閉じている
   today: string;
   items: Item[]; // 全アイテム（カテゴリフィルタ非適用 — シートはその日の全記録の真実）
-  records: IntakeRecord[]; // 表示月の記録（選択日は常に表示月内）
+  records: IntakeRecord[]; // 全記録（interval の予定・期限超過の導出が表示月外の記録に依存するため）
   onToggle: (key: RecordKey, taken: boolean) => void;
   onClose: () => void;
 };
@@ -72,11 +72,12 @@ function SheetBody({
   const isFuture = date > today;
   const isEmpty = entries.length === 0 && (isFuture || asNeeded.length === 0);
 
-  const renderEntry = ({ item, slots }: DayDetailEntry) => (
+  const renderEntry = ({ item, slots, overdueDays }: DayDetailEntry) => (
     <View key={item.id} style={styles.entry}>
       <View style={styles.itemRow}>
         <CategoryDot category={item.category} size={8} />
         <Text style={styles.itemName}>{item.name}</Text>
+        {overdueDays != null && <Text style={styles.overdueLabel}>{overdueDays}日遅れ</Text>}
       </View>
       {slots.map((slot) => (
         <RecordButton
@@ -184,6 +185,10 @@ const styles = StyleSheet.create({
   itemName: {
     ...typography.body,
     fontWeight: '500',
+  },
+  overdueLabel: {
+    ...typography.caption,
+    color: colors.error,
   },
   sectionLabel: {
     ...typography.caption,

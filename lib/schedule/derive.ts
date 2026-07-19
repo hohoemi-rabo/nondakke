@@ -162,6 +162,8 @@ export function getTodayItems(
 export type DayDetailEntry = {
   item: Item;
   slots: TodaySlot[];
+  // interval 型の飲み忘れ日数（今日のシートのみ・予定日超過中のみ非 null）。「N日遅れ」表示用
+  overdueDays: number | null;
 };
 
 export type DayDetail = {
@@ -193,10 +195,17 @@ export function deriveDayDetail(
         .filter((timing) => !baseTimings.includes(timing))
         .map((timing) => ({ timing, taken: true })),
     ];
+    // 期限超過は「今日どうすべきか」の情報なので今日のシートでのみ表示する。
+    // 今日の記録があれば次回予定は未来に張り直されるため自然に消える
+    const due =
+      date === today && item.scheduleType === 'interval'
+        ? getNextDueDate(item, records, today)
+        : null;
+    const overdueDays = due !== null && due < today ? diffDays(due, today) : null;
     if (recordedTimings.length > 0 || isScheduledOn(item, records, date, today)) {
-      entries.push({ item, slots });
+      entries.push({ item, slots, overdueDays });
     } else if (item.isActive && item.scheduleType === 'as_needed') {
-      asNeeded.push({ item, slots });
+      asNeeded.push({ item, slots, overdueDays: null });
     }
   }
   return { entries, asNeeded };
