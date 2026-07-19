@@ -36,6 +36,11 @@ export const colors = {
   catSupplement: '#D85A30',   // サプリ（コーラル）
   catOther:      '#B4B2A9',   // その他（グレー）
 
+  // カテゴリ淡色トーン（選択中タブの背景・ラベル。お薬は accentLight / accentDark を共用）
+  catSupplementLight: '#F9E7DF', // サプリ選択タブの背景
+  catSupplementDark:  '#7E3418', // サプリ淡背景上のラベル
+  catOtherLight:      '#F0EFEB', // その他選択タブの背景（ラベルは textSecondary を共用）
+
   // 曜日
   sunday:   '#993C1D',
   saturday: '#185FA5',
@@ -75,7 +80,10 @@ export const radius  = { card: 14, sheet: 20, chip: 999, cell: 8 };
 
 ### カテゴリ切替タブ（カレンダー画面上部）
 - 全部／お薬／サプリ／その他 の4等分タブ。角丸 chip、タップ領域44以上
-- 選択スタイルは登録フォームのチップと共通：選択中 = accentLight背景＋accentDark文字（500）、非選択 = 白背景＋border枠＋textSecondary
+- カテゴリタブには凡例と同じカテゴリ色ドット（8px）を常時表示（全部にはなし）
+- 選択中 = カテゴリ淡色背景＋カテゴリ濃色文字（500）で「いまどのカテゴリか」を色でも伝える
+  - 全部・お薬 = accentLight／accentDark、サプリ = catSupplementLight／catSupplementDark、その他 = catOtherLight／textSecondary
+- 非選択 = 白背景＋border枠＋textSecondary
 
 ### サマリーカード（カレンダー画面上部）
 - 背景 accentLight、角丸 card、影なし
