@@ -16,6 +16,8 @@ type MonthCalendarProps = {
   yearMonth: string; // 'YYYY-MM'
   today: string; // 'YYYY-MM-DD'
   schedule: Map<string, DayEntry[]>; // getMonthSchedule の結果
+  // 今日セルのハイライト色（選択中カテゴリのテーマ背景。タブ・サマリーカードと連動）
+  todayHighlight: string;
   onPrevMonth: () => void;
   onNextMonth: () => void;
   onSelectDate: (date: string) => void;
@@ -26,6 +28,7 @@ export function MonthCalendar({
   yearMonth,
   today,
   schedule,
+  todayHighlight,
   onPrevMonth,
   onNextMonth,
   onSelectDate,
@@ -76,6 +79,7 @@ export function MonthCalendar({
                 key={date}
                 date={date}
                 isToday={date === today}
+                todayHighlight={todayHighlight}
                 mark={summarizeDayEntries(schedule.get(date) ?? [], date, today)}
                 onPress={() => onSelectDate(date)}
               />
@@ -90,11 +94,13 @@ export function MonthCalendar({
 function DayCell({
   date,
   isToday,
+  todayHighlight,
   mark,
   onPress,
 }: {
   date: string;
   isToday: boolean;
+  todayHighlight: string;
   mark: DayCellMark | null;
   onPress: () => void;
 }) {
@@ -104,7 +110,7 @@ function DayCell({
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${day}日`}
-      style={[styles.cell, isToday && styles.cellToday]}>
+      style={[styles.cell, isToday && [styles.cellToday, { backgroundColor: todayHighlight }]]}>
       <Text
         style={[
           typography.calendarDay,
@@ -160,7 +166,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   cellToday: {
-    backgroundColor: colors.accentLight,
     borderRadius: radius.cell,
   },
   dayNumberToday: {

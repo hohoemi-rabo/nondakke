@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { categoryFilterTheme } from '@/components/calendar/category-theme';
 import { CategoryDot } from '@/components/ui/category-dot';
-import { type Category } from '@/constants/domain';
 import { colors, minTapSize, radius, spacing, typography } from '@/constants/tokens';
 import {
   CATEGORY_FILTER_ORDER,
@@ -14,22 +14,15 @@ type CategoryTabsProps = {
   onSelect: (filter: CategoryFilter) => void;
 };
 
-// 選択中タブの配色。カテゴリの識別色で「いまどのカテゴリ表示か」を伝える（DESIGN.md §5）。
+// カテゴリ切替タブ（全部／お薬／サプリ／その他）。カテゴリタブには凡例と同じ色ドットを常時表示し、
+// 選択中はカテゴリテーマの淡色に染まる（DESIGN.md §5）。
 // お薬はアクセントと共通のため「全部」と同じトーンになるが、ドットの有無で区別できる
-const SELECTED_COLORS: Record<'all' | Category, { background: string; label: string }> = {
-  all: { background: colors.accentLight, label: colors.accentDark },
-  medicine: { background: colors.accentLight, label: colors.accentDark },
-  supplement: { background: colors.catSupplementLight, label: colors.catSupplementDark },
-  other: { background: colors.catOtherLight, label: colors.textSecondary },
-};
-
-// カテゴリ切替タブ（全部／お薬／サプリ／その他）。カテゴリタブには凡例と同じ色ドットを常時表示
 export function CategoryTabs({ selected, onSelect }: CategoryTabsProps) {
   return (
     <View style={styles.row} accessibilityRole="tablist">
       {CATEGORY_FILTER_ORDER.map((filter) => {
         const isSelected = filter === selected;
-        const selectedColors = SELECTED_COLORS[filter ?? 'all'];
+        const theme = categoryFilterTheme(filter);
         return (
           <Pressable
             key={filter ?? 'all'}
@@ -38,17 +31,13 @@ export function CategoryTabs({ selected, onSelect }: CategoryTabsProps) {
             accessibilityState={{ selected: isSelected }}
             style={[
               styles.tab,
-              isSelected
-                ? { backgroundColor: selectedColors.background }
-                : styles.tabUnselected,
+              isSelected ? { backgroundColor: theme.background } : styles.tabUnselected,
             ]}>
             {filter !== null && <CategoryDot category={filter} size={8} />}
             <Text
               style={[
                 styles.label,
-                isSelected
-                  ? { color: selectedColors.label, fontWeight: '500' }
-                  : styles.labelUnselected,
+                isSelected ? { color: theme.dark, fontWeight: '500' } : styles.labelUnselected,
               ]}>
               {categoryFilterLabel(filter)}
             </Text>

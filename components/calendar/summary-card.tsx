@@ -1,52 +1,52 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { type CategoryTheme } from '@/components/calendar/category-theme';
 import { Card } from '@/components/ui/card';
-import { colors, typography } from '@/constants/tokens';
+import { typography } from '@/constants/tokens';
 
 type SummaryCardProps = {
   taken: number;
   remaining: number;
+  // 選択中カテゴリのテーマ。タブ・今日セルと同じ色に染まる
+  theme: CategoryTheme;
 };
 
 // 「今日のむもの」サマリーカード（DESIGN.md §5）。
 // 全部飲み終えたら文言を変え、数字ゼロを見せない
-export function SummaryCard({ taken, remaining }: SummaryCardProps) {
+export function SummaryCard({ taken, remaining, theme }: SummaryCardProps) {
   const total = taken + remaining;
 
   if (total === 0) {
     return (
-      <Card style={styles.card}>
-        <Text style={styles.doneText}>今日のむものはありません</Text>
+      <Card style={{ backgroundColor: theme.background }}>
+        <Text style={[styles.doneText, { color: theme.dark }]}>今日のむものはありません</Text>
       </Card>
     );
   }
 
   if (remaining === 0) {
     return (
-      <Card style={styles.card}>
-        <Text style={styles.doneText}>今日はぜんぶのんだ！</Text>
+      <Card style={{ backgroundColor: theme.background }}>
+        <Text style={[styles.doneText, { color: theme.dark }]}>今日はぜんぶのんだ！</Text>
       </Card>
     );
   }
 
   return (
-    <Card style={[styles.card, styles.row]}>
+    <Card style={[styles.row, { backgroundColor: theme.background }]}>
       <View>
-        <Text style={styles.label}>今日のむもの</Text>
-        <Text style={typography.summaryNumber}>{total}</Text>
+        <Text style={[styles.label, { color: theme.deep }]}>今日のむもの</Text>
+        <Text style={[typography.summaryNumber, { color: theme.dark }]}>{total}</Text>
       </View>
       <View style={styles.counts}>
-        <Text style={styles.countText}>✓ のんだ {taken}</Text>
-        <Text style={styles.countText}>のこり {remaining}</Text>
+        <Text style={[styles.countText, { color: theme.deep }]}>✓ のんだ {taken}</Text>
+        <Text style={[styles.countText, { color: theme.deep }]}>のこり {remaining}</Text>
       </View>
     </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.accentLight,
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -54,7 +54,6 @@ const styles = StyleSheet.create({
   },
   label: {
     ...typography.caption,
-    color: colors.accentDeep,
   },
   counts: {
     alignItems: 'flex-end',
@@ -63,11 +62,9 @@ const styles = StyleSheet.create({
   countText: {
     fontSize: 12,
     fontWeight: '400',
-    color: colors.accentDeep,
   },
   doneText: {
     fontSize: 14,
     fontWeight: '500',
-    color: colors.accentDark,
   },
 });

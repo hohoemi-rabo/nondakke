@@ -6,6 +6,7 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CategoryTabs } from '@/components/calendar/category-tabs';
+import { categoryFilterTheme } from '@/components/calendar/category-theme';
 import { DayDetailSheet } from '@/components/calendar/day-detail-sheet';
 import { Legend } from '@/components/calendar/legend';
 import { MonthCalendar } from '@/components/calendar/month-calendar';
@@ -89,6 +90,8 @@ export default function CalendarScreen() {
     selectedCategory === null ? items : items.filter((i) => i.category === selectedCategory);
   const schedule = getMonthSchedule(filteredItems, records, yearMonth, today);
   const { taken, remaining } = summarizeToday(getTodayItems(filteredItems, records, today));
+  // タブ・サマリーカード・今日セルを選択中カテゴリの色で揃える
+  const theme = categoryFilterTheme(selectedCategory);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -98,11 +101,12 @@ export default function CalendarScreen() {
           key={selectedCategory ?? 'all'}
           entering={FadeIn.duration(150)}
           style={styles.fadeGroup}>
-          <SummaryCard taken={taken} remaining={remaining} />
+          <SummaryCard taken={taken} remaining={remaining} theme={theme} />
           <MonthCalendar
             yearMonth={yearMonth}
             today={today}
             schedule={schedule}
+            todayHighlight={theme.background}
             onPrevMonth={() => setYearMonth(addMonths(yearMonth, -1))}
             onNextMonth={() => setYearMonth(addMonths(yearMonth, 1))}
             onSelectDate={setSelectedDate}
