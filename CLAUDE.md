@@ -19,7 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `components/calendar/` — `summary-card.tsx`／`month-calendar.tsx`（自作月グリッド。外部カレンダーライブラリ禁止）／`legend.tsx`／`category-tabs.tsx`（全部/お薬/サプリ/その他の4等分タブ。チップと同じ選択スタイル）／`day-detail-sheet.tsx`（RNコア Modal のボトムシート。表示専用でミューテーションは親が持つ。未来日は記録不可）。表示ロジックは `lib/schedule/calendar.ts` の純粋関数（buildMonthGrid / summarizeDayEntries / summarizeToday / formatDateLabel）に分離。日別スロット導出は `lib/schedule/derive.ts` の `deriveDayDetail`
 - `components/ui/record-button.tsx` — 「のんだ！」記録ボタン（未記録=白+枠／記録済み=accentLight+チェック。確認ダイアログなし・取り消しは再タップ）
 - `lib/category-filter.ts` — カテゴリフィルタの型・順序・ラベル（null=全部はUI概念のため domain.ts に置かない）。旧スワイプUIは廃止済み（タブ切替に変更）。`GestureHandlerRootView` は react-navigation 用にルートレイアウトに残置
-- `app/item/` — `new.tsx`（新規登録）／`[id].tsx`（編集）。ルートレイアウトで `presentation: 'modal'` 登録。ルートファイルは薄く保ち、フォーム本体は `components/item-form.tsx`
+- `app/item/` — `new.tsx`（新規登録）／`[id].tsx`（編集。個別削除ボタンつき：`confirmAsync` → `deleteItem` で記録ごと物理削除）。ルートレイアウトで `presentation: 'modal'` 登録。ルートファイルは薄く保ち、フォーム本体は `components/item-form.tsx`（編集時のみ `onDelete` を渡す）
 - `constants/tokens.ts` — カラー・余白・角丸・タイポのデザイントークン（DESIGN.md §2〜§4 の唯一のコード化。色リテラルをここ以外に書かない）
 - `constants/domain.ts` — Category / Timing / ScheduleType の型・定数・日本語ラベル＋曜日定数（WEEKDAY_LABELS / WEEKDAYS_MON_FIRST）
 - `components/ui/` — Card / Chip / CategoryDot（+テンプレート由来で継続使用の icon-symbol, haptic-tab）
