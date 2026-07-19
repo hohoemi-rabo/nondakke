@@ -19,6 +19,7 @@ const MAPPING = {
   'gearshape.fill': 'settings',
   'chevron.left': 'chevron-left',
   'chevron.right': 'chevron-right',
+  checkmark: 'check',
 } as IconMapping;
 
 /**

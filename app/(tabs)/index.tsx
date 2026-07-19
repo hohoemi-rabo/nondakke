@@ -7,13 +7,14 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CategoryIndicator } from '@/components/calendar/category-indicator';
+import { DayDetailSheet } from '@/components/calendar/day-detail-sheet';
 import { Legend } from '@/components/calendar/legend';
 import { MonthCalendar } from '@/components/calendar/month-calendar';
 import { SummaryCard } from '@/components/calendar/summary-card';
 import { colors, minTapSize, radius, spacing, typography } from '@/constants/tokens';
 import { cycleCategoryFilter, type CategoryFilter } from '@/lib/category-filter';
 import { listItems } from '@/lib/db/items';
-import { listRecordsByMonth } from '@/lib/db/records';
+import { addRecord, listRecordsByMonth, removeRecord, type RecordKey } from '@/lib/db/records';
 import { type IntakeRecord, type Item } from '@/lib/db/types';
 import { summarizeToday } from '@/lib/schedule/calendar';
 import { addMonths, monthOf, toDateString } from '@/lib/schedule/date';
@@ -27,9 +28,8 @@ export default function CalendarScreen() {
   const [yearMonth, setYearMonth] = useState(() => monthOf(toDateString(new Date())));
   // カテゴリフィルタ。スワイプ・インジケータータップで循環切替
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>(null);
-  // タップで選択した日。日別詳細シート（チケット09）がこの値を消費するまで参照は void のみ
+  // タップで選択した日。非 null の間、日別詳細シートを表示する
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  void selectedDate;
   const [items, setItems] = useState<Item[] | null>(null); // null = 初回ロード前
   const [monthRecords, setMonthRecords] = useState<IntakeRecord[]>([]);
   const [todayRecords, setTodayRecords] = useState<IntakeRecord[]>([]);
@@ -54,6 +54,20 @@ export default function CalendarScreen() {
   useFocusEffect(() => {
     void reload();
   });
+
+  // 記録のトグル。連打で UNIQUE 制約に当たっても reload で状態が収束する
+  async function handleToggle(key: RecordKey, taken: boolean) {
+    try {
+      if (taken) {
+        await removeRecord(db, key);
+      } else {
+        await addRecord(db, key);
+      }
+    } catch {
+      // 収束のため reload だけ行う
+    }
+    await reload();
+  }
 
   if (items === null) {
     return <SafeAreaView style={styles.container} />;
@@ -119,6 +133,14 @@ export default function CalendarScreen() {
           <Legend />
         </ScrollView>
       </GestureDetector>
+      <DayDetailSheet
+        date={selectedDate}
+        today={today}
+        items={items}
+        records={monthRecords}
+        onToggle={handleToggle}
+        onClose={() => setSelectedDate(null)}
+      />
     </SafeAreaView>
   );
 }

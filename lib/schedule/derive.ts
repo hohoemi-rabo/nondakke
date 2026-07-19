@@ -154,6 +154,49 @@ export function getTodayItems(
   return entries;
 }
 
+export type DayDetailEntry = {
+  item: Item;
+  slots: TodaySlot[];
+};
+
+export type DayDetail = {
+  // その日の予定 or 記録があるアイテム（as_needed・非アクティブの記録も含む — 記録の事実は常に表示）
+  entries: DayDetailEntry[];
+  // 記録導線用：その日に記録のないアクティブな as_needed アイテム（slots はすべて taken=false）
+  asNeeded: DayDetailEntry[];
+};
+
+// 日別詳細シート用：date のアイテム別スロット状態。
+// slots は item.timings（空なら 'none'）を基本に、timings に無いタイミングの記録があれば
+// 追記する — 後からタイミング設定を変えても既存の記録が見え、取り消せるようにするため
+export function deriveDayDetail(
+  items: Item[],
+  records: IntakeRecord[],
+  date: string,
+  today: string
+): DayDetail {
+  const entries: DayDetailEntry[] = [];
+  const asNeeded: DayDetailEntry[] = [];
+  for (const item of items) {
+    const recordedTimings = records
+      .filter((r) => r.itemId === item.id && r.takenDate === date)
+      .map((r) => r.timing);
+    const baseTimings: RecordTiming[] = item.timings.length > 0 ? item.timings : ['none'];
+    const slots = [
+      ...baseTimings.map((timing) => ({ timing, taken: recordedTimings.includes(timing) })),
+      ...recordedTimings
+        .filter((timing) => !baseTimings.includes(timing))
+        .map((timing) => ({ timing, taken: true })),
+    ];
+    if (recordedTimings.length > 0 || isScheduledOn(item, records, date, today)) {
+      entries.push({ item, slots });
+    } else if (item.isActive && item.scheduleType === 'as_needed') {
+      asNeeded.push({ item, slots });
+    }
+  }
+  return { entries, asNeeded };
+}
+
 // カレンダー1ヶ月分の日別状態。
 // recorded：その日に記録あり（as_needed・非アクティブのアイテムの記録も含む — 記録の事実は常に表示）
 // missed：予定日なのに未記録の過去日／scheduled：今日以降の予定（未記録）

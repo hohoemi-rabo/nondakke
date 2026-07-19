@@ -1,5 +1,6 @@
 import { type IntakeRecord, type Item } from '@/lib/db/types';
 import {
+  deriveDayDetail,
   getMonthSchedule,
   getNextDueDate,
   getTodayItems,
@@ -242,5 +243,95 @@ describe('getMonthSchedule', () => {
       { item: a, status: 'recorded' },
       { item: b, status: 'scheduled' },
     ]);
+  });
+});
+
+describe('deriveDayDetail', () => {
+  it('daily アイテムのタイミングをスロット展開する', () => {
+    const item = makeItem({ timings: ['morning', 'evening'] });
+    const { entries, asNeeded } = deriveDayDetail([item], [], TODAY, TODAY);
+    expect(entries).toEqual([
+      {
+        item,
+        slots: [
+          { timing: 'morning', taken: false },
+          { timing: 'evening', taken: false },
+        ],
+      },
+    ]);
+    expect(asNeeded).toEqual([]);
+  });
+
+  it('記録済みのスロットは taken=true', () => {
+    const item = makeItem({ timings: ['morning', 'evening'] });
+    const records = [makeRecord(item.id, TODAY, 'morning')];
+    const { entries } = deriveDayDetail([item], records, TODAY, TODAY);
+    expect(entries[0].slots).toEqual([
+      { timing: 'morning', taken: true },
+      { timing: 'evening', taken: false },
+    ]);
+  });
+
+  it('タイミング未設定は none 1スロット', () => {
+    const item = makeItem({ timings: [] });
+    const { entries } = deriveDayDetail([item], [], TODAY, TODAY);
+    expect(entries[0].slots).toEqual([{ timing: 'none', taken: false }]);
+  });
+
+  it('weekly の非予定日でも記録があれば entries に含める', () => {
+    // 2026-07-19 は日曜。月曜のみ予定の weekly
+    const item = makeItem({ scheduleType: 'weekly', weekdays: [1], timings: ['morning'] });
+    const records = [makeRecord(item.id, TODAY, 'morning')];
+    const { entries } = deriveDayDetail([item], records, TODAY, TODAY);
+    expect(entries).toHaveLength(1);
+    expect(entries[0].slots[0].taken).toBe(true);
+    const without = deriveDayDetail([item], [], TODAY, TODAY);
+    expect(without.entries).toHaveLength(0);
+  });
+
+  it('as_needed は未記録なら asNeeded、記録済みなら entries に入る', () => {
+    const item = makeItem({ scheduleType: 'as_needed', timings: [] });
+    const empty = deriveDayDetail([item], [], TODAY, TODAY);
+    expect(empty.entries).toHaveLength(0);
+    expect(empty.asNeeded).toEqual([{ item, slots: [{ timing: 'none', taken: false }] }]);
+
+    const records = [makeRecord(item.id, TODAY, 'none')];
+    const recorded = deriveDayDetail([item], records, TODAY, TODAY);
+    expect(recorded.entries).toEqual([{ item, slots: [{ timing: 'none', taken: true }] }]);
+    expect(recorded.asNeeded).toHaveLength(0);
+  });
+
+  it('非アクティブは記録がある日だけ entries に出て、asNeeded には出ない', () => {
+    const inactive = makeItem({ scheduleType: 'as_needed', isActive: false, timings: [] });
+    const without = deriveDayDetail([inactive], [], TODAY, TODAY);
+    expect(without.entries).toHaveLength(0);
+    expect(without.asNeeded).toHaveLength(0);
+
+    const records = [makeRecord(inactive.id, TODAY, 'none')];
+    const withRecord = deriveDayDetail([inactive], records, TODAY, TODAY);
+    expect(withRecord.entries).toHaveLength(1);
+  });
+
+  it('timings に無いタイミングの記録は追記スロットとして表示する', () => {
+    const item = makeItem({ timings: ['morning'] });
+    const records = [makeRecord(item.id, TODAY, 'noon')];
+    const { entries } = deriveDayDetail([item], records, TODAY, TODAY);
+    expect(entries[0].slots).toEqual([
+      { timing: 'morning', taken: false },
+      { timing: 'noon', taken: true },
+    ]);
+  });
+
+  it('開始日前の日は entries に含めない', () => {
+    const item = makeItem({ createdAt: '2026-07-10T12:00:00.000Z' });
+    const { entries } = deriveDayDetail([item], [], '2026-07-05', TODAY);
+    expect(entries).toHaveLength(0);
+  });
+
+  it('interval の過去予定日（期限超過）も entries に含める', () => {
+    const item = makeItem({ scheduleType: 'interval', intervalDays: 3 });
+    // 開始日 2026-07-01・記録なし → 7/1 以降ずっと予定が残る
+    const { entries } = deriveDayDetail([item], [], '2026-07-10', TODAY);
+    expect(entries).toHaveLength(1);
   });
 });

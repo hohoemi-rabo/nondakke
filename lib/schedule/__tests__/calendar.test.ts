@@ -1,6 +1,7 @@
 import { type Item } from '@/lib/db/types';
 import {
   buildMonthGrid,
+  formatDateLabel,
   formatMonthLabel,
   summarizeDayEntries,
   summarizeToday,
@@ -177,5 +178,12 @@ describe('formatMonthLabel', () => {
   it('ゼロ埋めなしの年月表記', () => {
     expect(formatMonthLabel('2026-07')).toBe('2026年7月');
     expect(formatMonthLabel('2026-12')).toBe('2026年12月');
+  });
+});
+
+describe('formatDateLabel', () => {
+  it('ゼロ埋めなしの月日＋曜日表記', () => {
+    expect(formatDateLabel('2026-07-19')).toBe('7月19日（日）');
+    expect(formatDateLabel('2026-07-01')).toBe('7月1日（水）');
   });
 });

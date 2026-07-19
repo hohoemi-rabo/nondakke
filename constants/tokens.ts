@@ -29,6 +29,9 @@ export const colors = {
 
   // エラー表示にのみ使用可
   error: '#C4442A',
+
+  // ボトムシートのバックドロップ（textPrimary 由来の中立スクリム）
+  overlay: 'rgba(44, 44, 42, 0.3)',
 } as const;
 
 // DESIGN.md §4 余白・形状

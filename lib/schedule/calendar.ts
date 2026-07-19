@@ -2,7 +2,7 @@
 // derive.ts の結果を画面の描画単位（グリッド・セルのマーク・サマリー数値）に変換する。
 // DB・React に依存しない純粋関数のみ
 
-import { type Category } from '@/constants/domain';
+import { WEEKDAY_LABELS, type Category } from '@/constants/domain';
 import { type DayEntry, type TodayEntry } from '@/lib/schedule/derive';
 import { datesOfMonth, weekdayOf } from '@/lib/schedule/date';
 
@@ -73,4 +73,10 @@ export function summarizeToday(entries: TodayEntry[]): { taken: number; remainin
 export function formatMonthLabel(yearMonth: string): string {
   const [y, m] = yearMonth.split('-').map(Number);
   return `${y}年${m}月`;
+}
+
+// '2026-07-19' → '7月19日（日）'（日別詳細シートのヘッダー用）
+export function formatDateLabel(date: string): string {
+  const [, m, d] = date.split('-').map(Number);
+  return `${m}月${d}日（${WEEKDAY_LABELS[weekdayOf(date)]}）`;
 }
