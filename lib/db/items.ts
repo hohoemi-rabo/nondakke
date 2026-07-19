@@ -154,6 +154,11 @@ export async function deactivateItem(db: SQLiteDatabase, id: number): Promise<vo
   await db.runAsync('UPDATE items SET is_active = 0 WHERE id = ?', id);
 }
 
+// 服用再開（中止の取り消し）
+export async function reactivateItem(db: SQLiteDatabase, id: number): Promise<void> {
+  await db.runAsync('UPDATE items SET is_active = 1 WHERE id = ?', id);
+}
+
 // 物理削除。関連する記録も同一トランザクションで削除する
 export async function deleteItem(db: SQLiteDatabase, id: number): Promise<void> {
   await db.withTransactionAsync(async () => {

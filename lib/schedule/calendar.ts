@@ -2,7 +2,8 @@
 // derive.ts の結果を画面の描画単位（グリッド・セルのマーク・サマリー数値）に変換する。
 // DB・React に依存しない純粋関数のみ
 
-import { WEEKDAY_LABELS, type Category } from '@/constants/domain';
+import { WEEKDAY_LABELS, WEEKDAYS_MON_FIRST, type Category } from '@/constants/domain';
+import { type Item } from '@/lib/db/types';
 import { type DayEntry, type TodayEntry } from '@/lib/schedule/derive';
 import { datesOfMonth, weekdayOf } from '@/lib/schedule/date';
 
@@ -79,4 +80,23 @@ export function formatMonthLabel(yearMonth: string): string {
 export function formatDateLabel(date: string): string {
   const [, m, d] = date.split('-').map(Number);
   return `${m}月${d}日（${WEEKDAY_LABELS[weekdayOf(date)]}）`;
+}
+
+// 服用パターンの日本語表示（一覧画面用）。例：「毎日」「3日に1回」「月・木」「不定期」
+export function formatScheduleLabel(
+  item: Pick<Item, 'scheduleType' | 'intervalDays' | 'weekdays'>
+): string {
+  switch (item.scheduleType) {
+    case 'daily':
+      return '毎日';
+    case 'interval':
+      return `${item.intervalDays}日に1回`;
+    case 'weekly':
+      // 保存順に依らず月始まりの表示順にする
+      return WEEKDAYS_MON_FIRST.filter((d) => item.weekdays.includes(d))
+        .map((d) => WEEKDAY_LABELS[d])
+        .join('・');
+    case 'as_needed':
+      return '不定期';
+  }
 }

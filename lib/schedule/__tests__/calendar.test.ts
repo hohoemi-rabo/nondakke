@@ -3,6 +3,7 @@ import {
   buildMonthGrid,
   formatDateLabel,
   formatMonthLabel,
+  formatScheduleLabel,
   summarizeDayEntries,
   summarizeToday,
 } from '@/lib/schedule/calendar';
@@ -185,5 +186,30 @@ describe('formatDateLabel', () => {
   it('ゼロ埋めなしの月日＋曜日表記', () => {
     expect(formatDateLabel('2026-07-19')).toBe('7月19日（日）');
     expect(formatDateLabel('2026-07-01')).toBe('7月1日（水）');
+  });
+});
+
+describe('formatScheduleLabel', () => {
+  it('毎日・不定期は固定ラベル', () => {
+    expect(formatScheduleLabel(makeItem({ scheduleType: 'daily' }))).toBe('毎日');
+    expect(formatScheduleLabel(makeItem({ scheduleType: 'as_needed' }))).toBe('不定期');
+  });
+
+  it('interval は日数入りのラベル', () => {
+    expect(formatScheduleLabel(makeItem({ scheduleType: 'interval', intervalDays: 3 }))).toBe(
+      '3日に1回'
+    );
+    expect(formatScheduleLabel(makeItem({ scheduleType: 'interval', intervalDays: 1 }))).toBe(
+      '1日に1回'
+    );
+  });
+
+  it('weekly は保存順に依らず月始まりの曜日表記', () => {
+    expect(formatScheduleLabel(makeItem({ scheduleType: 'weekly', weekdays: [4, 1] }))).toBe(
+      '月・木'
+    );
+    expect(formatScheduleLabel(makeItem({ scheduleType: 'weekly', weekdays: [0, 6, 1] }))).toBe(
+      '月・土・日'
+    );
   });
 });

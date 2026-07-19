@@ -80,14 +80,10 @@ export async function listRecordsByDate(
   return rows.map(recordFromRow);
 }
 
-// 最終服用日。一覧画面の表示と interval 型の次回予定算出（最終服用日＋N日）に使う
-export async function getLastTakenDate(
-  db: SQLiteDatabase,
-  itemId: number
-): Promise<string | null> {
-  const row = await db.getFirstAsync<{ last_taken: string | null }>(
-    'SELECT MAX(taken_date) AS last_taken FROM intake_records WHERE item_id = ?',
-    itemId
+// 全アイテムの最終服用日を1クエリで取得（一覧画面用。アイテムごとに発行しない — N+1回避）
+export async function getLastTakenDates(db: SQLiteDatabase): Promise<Map<number, string>> {
+  const rows = await db.getAllAsync<{ item_id: number; last_taken: string }>(
+    'SELECT item_id, MAX(taken_date) AS last_taken FROM intake_records GROUP BY item_id'
   );
-  return row?.last_taken ?? null;
+  return new Map(rows.map((row) => [row.item_id, row.last_taken]));
 }
