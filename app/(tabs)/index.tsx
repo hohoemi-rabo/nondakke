@@ -2,17 +2,16 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { CategoryIndicator } from '@/components/calendar/category-indicator';
+import { CategoryTabs } from '@/components/calendar/category-tabs';
 import { DayDetailSheet } from '@/components/calendar/day-detail-sheet';
 import { Legend } from '@/components/calendar/legend';
 import { MonthCalendar } from '@/components/calendar/month-calendar';
 import { SummaryCard } from '@/components/calendar/summary-card';
 import { colors, minTapSize, radius, spacing, typography } from '@/constants/tokens';
-import { cycleCategoryFilter, type CategoryFilter } from '@/lib/category-filter';
+import { type CategoryFilter } from '@/lib/category-filter';
 import { listItems } from '@/lib/db/items';
 import { addRecord, listRecordsByMonth, removeRecord, type RecordKey } from '@/lib/db/records';
 import { type IntakeRecord, type Item } from '@/lib/db/types';
@@ -26,7 +25,7 @@ export default function CalendarScreen() {
 
   const [today, setToday] = useState(() => toDateString(new Date()));
   const [yearMonth, setYearMonth] = useState(() => monthOf(toDateString(new Date())));
-  // カテゴリフィルタ。スワイプ・インジケータータップで循環切替
+  // カテゴリフィルタ。タブで切替
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>(null);
   // タップで選択した日。非 null の間、日別詳細シートを表示する
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -95,44 +94,26 @@ export default function CalendarScreen() {
   const schedule = getMonthSchedule(filteredItems, monthRecords, yearMonth, today);
   const { taken, remaining } = summarizeToday(getTodayItems(filteredItems, todayRecords, today));
 
-  // 左スワイプ = 次のカテゴリ（ページ送り方向）。横16pxまで非活性でタップと、
-  // 縦12pxで失敗にして縦スクロールと役割分担する（docs/08 設計メモ）
-  const swipeFilter = Gesture.Pan()
-    .activeOffsetX([-16, 16])
-    .failOffsetY([-12, 12])
-    .runOnJS(true)
-    .onEnd((e) => {
-      if (Math.abs(e.translationX) < 48 && Math.abs(e.velocityX) < 500) {
-        return;
-      }
-      setSelectedCategory((c) => cycleCategoryFilter(c, e.translationX < 0 ? 1 : -1));
-    });
-
   return (
     <SafeAreaView style={styles.container}>
-      <GestureDetector gesture={swipeFilter}>
-        <ScrollView contentContainerStyle={styles.content}>
-          <CategoryIndicator
-            selected={selectedCategory}
-            onPress={() => setSelectedCategory((c) => cycleCategoryFilter(c, 1))}
+      <ScrollView contentContainerStyle={styles.content}>
+        <CategoryTabs selected={selectedCategory} onSelect={setSelectedCategory} />
+        <Animated.View
+          key={selectedCategory ?? 'all'}
+          entering={FadeIn.duration(150)}
+          style={styles.fadeGroup}>
+          <SummaryCard taken={taken} remaining={remaining} />
+          <MonthCalendar
+            yearMonth={yearMonth}
+            today={today}
+            schedule={schedule}
+            onPrevMonth={() => setYearMonth(addMonths(yearMonth, -1))}
+            onNextMonth={() => setYearMonth(addMonths(yearMonth, 1))}
+            onSelectDate={setSelectedDate}
           />
-          <Animated.View
-            key={selectedCategory ?? 'all'}
-            entering={FadeIn.duration(150)}
-            style={styles.fadeGroup}>
-            <SummaryCard taken={taken} remaining={remaining} />
-            <MonthCalendar
-              yearMonth={yearMonth}
-              today={today}
-              schedule={schedule}
-              onPrevMonth={() => setYearMonth(addMonths(yearMonth, -1))}
-              onNextMonth={() => setYearMonth(addMonths(yearMonth, 1))}
-              onSelectDate={setSelectedDate}
-            />
-          </Animated.View>
-          <Legend />
-        </ScrollView>
-      </GestureDetector>
+        </Animated.View>
+        <Legend />
+      </ScrollView>
       <DayDetailSheet
         date={selectedDate}
         today={today}
