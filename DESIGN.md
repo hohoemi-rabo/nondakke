@@ -36,10 +36,11 @@ export const colors = {
   catSupplement: '#D85A30',   // サプリ（コーラル）
   catOther:      '#B4B2A9',   // その他（グレー）
 
-  // カテゴリ淡色トーン（選択中タブの背景・ラベル。お薬は accentLight / accentDark を共用）
-  catSupplementLight: '#F9E7DF', // サプリ選択タブの背景
+  // カテゴリ淡色トーン（選択中タブ・サマリーカード・今日セルの背景とラベル）
+  catMedicineLight:   '#C5EADB', // お薬選択時の背景（「全部」の accentLight より一段濃いミント）
+  catSupplementLight: '#F9E7DF', // サプリ選択時の背景
   catSupplementDark:  '#7E3418', // サプリ淡背景上のラベル
-  catOtherLight:      '#F0EFEB', // その他選択タブの背景（ラベルは textSecondary を共用）
+  catOtherLight:      '#F0EFEB', // その他選択時の背景（ラベルは textSecondary を共用）
 
   // 曜日
   sunday:   '#993C1D',
@@ -82,11 +83,11 @@ export const radius  = { card: 14, sheet: 20, chip: 999, cell: 8 };
 - 全部／お薬／サプリ／その他 の4等分タブ。角丸 chip、タップ領域44以上
 - カテゴリタブには凡例と同じカテゴリ色ドット（8px）を常時表示（全部にはなし）
 - 選択中 = カテゴリ淡色背景＋カテゴリ濃色文字（500）で「いまどのカテゴリか」を色でも伝える
-  - 全部・お薬 = accentLight／accentDark、サプリ = catSupplementLight／catSupplementDark、その他 = catOtherLight／textSecondary
+  - 全部 = accentLight／accentDark、お薬 = catMedicineLight／accentDark（全部より濃いミント）、サプリ = catSupplementLight／catSupplementDark、その他 = catOtherLight／textSecondary
 - 非選択 = 白背景＋border枠＋textSecondary
 
 ### サマリーカード（カレンダー画面上部）
-- 背景は選択中カテゴリのテーマ淡色（全部・お薬=accentLight、サプリ=catSupplementLight、その他=catOtherLight）。角丸 card、影なし
+- 背景は選択中カテゴリのテーマ淡色（全部=accentLight、お薬=catMedicineLight、サプリ=catSupplementLight、その他=catOtherLight）。角丸 card、影なし
 - 左：ラベル「今日のむもの」（11 / テーマ deep 色）＋大数字（26 / テーマ dark 色）
 - 右：「✓ のんだ n」「のこり n」（12 / テーマ deep 色）
 - 全部飲み終えたら文言を「今日はぜんぶのんだ！」に変える（数字ゼロを見せない）
