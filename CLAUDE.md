@@ -9,8 +9,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 「のんだっけ？」— 服薬・サプリ摂取記録カレンダーアプリ（Expo SDK 54 / React Native / TypeScript / expo-router）。
 
 - 仕様の唯一の情報源は **REQUIREMENTS.md**（要件・データモデル・画面構成）と **DESIGN.md**（カラートークン・タイポ・コンポーネント仕様）。実装前に必ず両方を参照すること
-- 実装タスクは **docs/00-overview.md** のチケット（01〜12、依存関係つき）に分割済み。着手時は該当チケットを読み、完了条件を満たすこと
-- 現在のコードは create-expo-app のデフォルトテンプレートのまま。`app/(tabs)/` 以下のサンプル画面（explore.tsx 等）や `components/` のテンプレート部品（hello-wave, parallax-scroll-view 等）は本アプリの実装時に置き換え・削除する対象
+- 実装タスクは **docs/00-overview.md** のチケット（01〜12、依存関係つき）に分割済み。着手時は該当チケットを読み、完了条件を満たすこと。チケット完了時はチケットファイルのチェックボックスと 00-overview.md の状態列を更新する（docs: コミットで実装と分離）
+
+## コード構成（チケット01〜05 完了時点）
+
+- `app/(tabs)/` — 3タブ：`index.tsx`（カレンダー=ホーム）／`items.tsx`（一覧）／`settings.tsx`（設定）。06〜11 でプレースホルダーから実装に置き換える
+- `constants/tokens.ts` — カラー・余白・角丸・タイポのデザイントークン（DESIGN.md §2〜§4 の唯一のコード化。色リテラルをここ以外に書かない）
+- `constants/domain.ts` — Category / Timing / ScheduleType の型・定数・日本語ラベル
+- `components/ui/` — Card / Chip / CategoryDot（+テンプレート由来で継続使用の icon-symbol, haptic-tab）
+- `lib/db/` — `migrations.ts`（PRAGMA user_version 方式・スキーマv1）／`types.ts`（行型とアプリ型の分離）／`items.ts`・`records.ts`（リポジトリ。画面から生SQLを書かない）
+- `lib/schedule/` — `date.ts`（YYYY-MM-DD 文字列ベースの日付演算）／`derive.ts`（予定日導出の純粋関数：`isScheduledOn` / `getNextDueDate` / `getTodayItems` / `getMonthSchedule`）。DB・React 非依存を維持すること
 
 ## コマンド
 
@@ -20,9 +28,8 @@ npm run android      # Android エミュレータ/実機で起動
 npm run web          # ブラウザで起動
 npm run lint         # expo lint（eslint-config-expo, flat config）
 npx tsc --noEmit     # 型チェック
+npm test             # jest（jest-expo preset）。単体テストは lib/schedule/__tests__/
 ```
-
-テストフレームワークは未導入。
 
 ## アーキテクチャ上の重要な決定
 
