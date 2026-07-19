@@ -25,7 +25,7 @@
 |---|---------|------|------|
 | 01 | [プロジェクト基盤整備](01-project-setup.md) | テンプレートコードの削除、3タブ構成の骨組み | ✅ 完了 |
 | 02 | [デザイントークン・共通UI部品](02-design-tokens.md) | DESIGN.mdのトークンをコード化、基本コンポーネント | ✅ 完了 |
-| 03 | [SQLiteデータベース基盤](03-database-setup.md) | expo-sqlite導入、スキーマ、マイグレーション | 未着手 |
+| 03 | [SQLiteデータベース基盤](03-database-setup.md) | expo-sqlite導入、スキーマ、マイグレーション | ✅ 完了 |
 | 04 | [データアクセス層](04-data-access-layer.md) | items / intake_records のCRUD関数 | 未着手 |
 | 05 | [予定日導出ロジック](05-schedule-derivation.md) | スケジュール計算のコアロジック＋単体テスト | 未着手 |
 | 06 | [アイテム登録・編集画面](06-item-form-screen.md) | 30秒で登録完了できるフォーム | 未着手 |

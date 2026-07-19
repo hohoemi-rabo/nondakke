@@ -11,12 +11,12 @@ expo-sqlite を導入し、REQUIREMENTS.md §3 のスキーマでデータベー
 
 ## タスク
 
-- [ ] `npx expo install expo-sqlite` で導入
-- [ ] `app/_layout.tsx` に `<SQLiteProvider databaseName="nodakke.db" onInit={migrateDbIfNeeded}>` を設置
-- [ ] `lib/db/migrations.ts` にマイグレーション関数を実装
+- [x] `npx expo install expo-sqlite` で導入
+- [x] `app/_layout.tsx` に `<SQLiteProvider databaseName="nodakke.db" onInit={migrateDbIfNeeded}>` を設置
+- [x] `lib/db/migrations.ts` にマイグレーション関数を実装
   - `PRAGMA user_version` によるバージョン管理方式（CLAUDE.md参照）
   - 初回マイグレーションで `PRAGMA journal_mode = 'wal'` を設定
-- [ ] スキーマ定義（バージョン1）
+- [x] スキーマ定義（バージョン1）
 
 ```sql
 CREATE TABLE items (
@@ -44,8 +44,8 @@ CREATE TABLE intake_records (
 CREATE INDEX idx_records_item_date ON intake_records(item_id, taken_date);
 ```
 
-- [ ] `PRAGMA foreign_keys = ON` を接続時に有効化
-- [ ] TypeScript の型定義（`Item`, `IntakeRecord`）を `lib/db/types.ts` に作成。DB行の型とアプリ内で使う型（timings を配列に変換した形など）を分ける
+- [x] `PRAGMA foreign_keys = ON` を接続時に有効化
+- [x] TypeScript の型定義（`Item`, `IntakeRecord`）を `lib/db/types.ts` に作成。DB行の型とアプリ内で使う型（timings を配列に変換した形など）を分ける
 
 ## 設計メモ
 
