@@ -15,8 +15,7 @@ type CategoryTabsProps = {
 };
 
 // カテゴリ切替タブ（全部／お薬／サプリ／その他）。カテゴリタブには凡例と同じ色ドットを常時表示し、
-// 選択中はカテゴリテーマの淡色に染まる（DESIGN.md §5）。
-// お薬はアクセントと共通のため「全部」と同じトーンになるが、ドットの有無で区別できる
+// 選択中はカテゴリテーマの淡色に染まる（DESIGN.md §5）
 export function CategoryTabs({ selected, onSelect }: CategoryTabsProps) {
   return (
     <View style={styles.row} accessibilityRole="tablist">

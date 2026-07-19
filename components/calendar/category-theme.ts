@@ -11,6 +11,13 @@ export type CategoryTheme = {
 // タブ・サマリーカード・今日セルが同じテーマで染まり、いまどのカテゴリ表示かを色で伝える
 export function categoryFilterTheme(filter: CategoryFilter): CategoryTheme {
   switch (filter) {
+    // お薬はアクセントと同系だが、「全部」（accentLight）と見分けられるよう一段濃いミント
+    case 'medicine':
+      return {
+        background: colors.catMedicineLight,
+        deep: colors.accentDeep,
+        dark: colors.accentDark,
+      };
     case 'supplement':
       return {
         background: colors.catSupplementLight,
@@ -23,7 +30,7 @@ export function categoryFilterTheme(filter: CategoryFilter): CategoryTheme {
         deep: colors.textSecondary,
         dark: colors.textPrimary,
       };
-    // null（全部）・お薬はアクセントと共通
+    // null（全部）はアプリの基本色
     default:
       return {
         background: colors.accentLight,
