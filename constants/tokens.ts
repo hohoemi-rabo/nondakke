@@ -23,6 +23,11 @@ export const colors = {
   catSupplement: '#D85A30', // サプリ（コーラル）
   catOther: '#B4B2A9', // その他（グレー）
 
+  // カテゴリ淡色トーン（選択中タブの背景・ラベル。お薬は accentLight / accentDark を共用）
+  catSupplementLight: '#F9E7DF', // サプリ選択タブの背景
+  catSupplementDark: '#7E3418', // サプリ淡背景上のラベル
+  catOtherLight: '#F0EFEB', // その他選択タブの背景（ラベルは textSecondary を共用）
+
   // 曜日
   sunday: '#993C1D',
   saturday: '#185FA5',
