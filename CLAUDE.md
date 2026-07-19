@@ -11,9 +11,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 仕様の唯一の情報源は **REQUIREMENTS.md**（要件・データモデル・画面構成）と **DESIGN.md**（カラートークン・タイポ・コンポーネント仕様）。実装前に必ず両方を参照すること
 - 実装タスクは **docs/00-overview.md** のチケット（01〜12、依存関係つき）に分割済み。着手時は該当チケットを読み、完了条件を満たすこと。チケット完了時はチケットファイルのチェックボックスと 00-overview.md の状態列を更新する（docs: コミットで実装と分離）
 
-## コード構成（チケット01〜09 完了時点）
+## コード構成（チケット01〜10 完了時点）
 
-- `app/(tabs)/` — 3タブ：`index.tsx`（カレンダー=ホーム。月表示＋サマリーカード＋カテゴリスワイプ＋日別詳細シート実装済み。記録トグルは `handleToggle` → `reload()` で即時反映）／`items.tsx`（一覧）／`settings.tsx`（設定）。10〜11 でプレースホルダーから実装に置き換える
+- `app/(tabs)/` — 3タブ：`index.tsx`（カレンダー=ホーム。月表示＋サマリーカード＋カテゴリスワイプ＋日別詳細シート実装済み。記録トグルは `handleToggle` → `reload()` で即時反映）／`items.tsx`（一覧。カテゴリ別セクション＋中止/再開＋ヘッダー「＋」導線。最終服用日は `getLastTakenDates` の GROUP BY 一括取得）／`settings.tsx`（設定。11 で実装）
+- `lib/confirm.ts` — `confirmAsync`（web は window.confirm、ネイティブは Alert.alert。react-native-web の Alert が no-op のため）
 - `components/calendar/` — `summary-card.tsx`／`month-calendar.tsx`（自作月グリッド。外部カレンダーライブラリ禁止）／`legend.tsx`／`category-indicator.tsx`（ドット4つ＋ラベル。タップでも循環）／`day-detail-sheet.tsx`（RNコア Modal のボトムシート。表示専用でミューテーションは親が持つ。未来日は記録不可）。表示ロジックは `lib/schedule/calendar.ts` の純粋関数（buildMonthGrid / summarizeDayEntries / summarizeToday / formatDateLabel）に分離。日別スロット導出は `lib/schedule/derive.ts` の `deriveDayDetail`
 - `components/ui/record-button.tsx` — 「のんだ！」記録ボタン（未記録=白+枠／記録済み=accentLight+チェック。確認ダイアログなし・取り消しは再タップ）
 - `lib/category-filter.ts` — カテゴリフィルタの循環ロジック（null=全部はUI概念のため domain.ts に置かない）。スワイプは Pan + `.runOnJS(true)`、`GestureHandlerRootView` はルートレイアウトに設置済み
