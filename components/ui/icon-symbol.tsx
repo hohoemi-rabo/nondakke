@@ -17,6 +17,8 @@ const MAPPING = {
   calendar: 'calendar-today',
   'list.bullet': 'format-list-bulleted',
   'gearshape.fill': 'settings',
+  'chevron.left': 'chevron-left',
+  'chevron.right': 'chevron-right',
 } as IconMapping;
 
 /**

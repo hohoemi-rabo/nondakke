@@ -1,4 +1,12 @@
-import { addDays, datesOfMonth, diffDays, toDateString, weekdayOf } from '@/lib/schedule/date';
+import {
+  addDays,
+  addMonths,
+  datesOfMonth,
+  diffDays,
+  monthOf,
+  toDateString,
+  weekdayOf,
+} from '@/lib/schedule/date';
 
 describe('addDays', () => {
   it('月末を跨ぐ', () => {
@@ -61,6 +69,33 @@ describe('datesOfMonth', () => {
     const dates = datesOfMonth('2028-02');
     expect(dates).toHaveLength(29);
     expect(dates[28]).toBe('2028-02-29');
+  });
+});
+
+describe('monthOf', () => {
+  it('日付文字列から年月を取り出す', () => {
+    expect(monthOf('2026-07-19')).toBe('2026-07');
+  });
+});
+
+describe('addMonths', () => {
+  it('翌月・前月', () => {
+    expect(addMonths('2026-07', 1)).toBe('2026-08');
+    expect(addMonths('2026-07', -1)).toBe('2026-06');
+  });
+
+  it('年を跨ぐ', () => {
+    expect(addMonths('2026-12', 1)).toBe('2027-01');
+    expect(addMonths('2026-01', -1)).toBe('2025-12');
+  });
+
+  it('0ヶ月はそのまま', () => {
+    expect(addMonths('2026-07', 0)).toBe('2026-07');
+  });
+
+  it('複数年の加算', () => {
+    expect(addMonths('2026-07', 18)).toBe('2028-01');
+    expect(addMonths('2026-07', -19)).toBe('2024-12');
   });
 });
 

@@ -38,6 +38,20 @@ export function weekdayOf(dateStr: string): number {
   return new Date(toUtc(dateStr)).getUTCDay();
 }
 
+// 'YYYY-MM-DD' → 'YYYY-MM'
+export function monthOf(dateStr: string): string {
+  return dateStr.slice(0, 7);
+}
+
+// 'YYYY-MM' に n ヶ月加算（負数可）。年跨ぎは通算月数の整数演算で処理
+export function addMonths(yearMonth: string, n: number): string {
+  const [y, m] = yearMonth.split('-').map(Number);
+  const total = y * 12 + (m - 1) + n;
+  const year = Math.floor(total / 12);
+  const month = (total % 12) + 1;
+  return `${year}-${String(month).padStart(2, '0')}`;
+}
+
 // 'YYYY-MM' の全日付を昇順で返す（月末・うるう年は Date.UTC の繰り上がりで処理）
 export function datesOfMonth(yearMonth: string): string[] {
   const [y, m] = yearMonth.split('-').map(Number);
